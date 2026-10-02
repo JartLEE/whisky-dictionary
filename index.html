@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>호랑파파의 주류 백과사전(위스키-Whisky)</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary-color: #b85b14; /* 위스키 호박색 느낌의 메인 컬러 */
+            --text-main: #212529;
+            --text-sub: #6c757d;
+            --border-color: #e9ecef;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 모바일 최적화 컨테이너 */
+        .mobile-container {
+            width: 100%;
+            max-width: 480px; /* 모바일 프레임 너비 */
+            background-color: #fff;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            padding-bottom: 40px;
+        }
+
+        /* 고정 상단 헤더 */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 16px;
+            z-index: 100;
+        }
+
+        .home-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 1.05rem;
+            width: fit-content;
+        }
+
+        .home-banner .icon {
+            font-size: 1.3rem;
+        }
+
+        /* 검색 영역 */
+        .search-section {
+            padding: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background-color: #f1f3f5;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            background-color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(184, 91, 20, 0.1);
+        }
+
+        /* 수록 통계 현황 */
+        .stats-section {
+            padding: 0 16px 16px 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+        }
+
+        .stat-count {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* 카테고리 탭 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 16px 16px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 주류 리스트 */
+        .liquor-list {
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .liquor-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+        }
+
+        .liquor-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .liquor-name {
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .liquor-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background-color: #fdf3eb;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <header>
+        <a href="#" class="home-banner" onclick="resetFilter()">
+            <span class="icon">🥃</span>
+            <span>호랑파파의 주류 백과사전(위스키-Whisky)</span>
+        </a>
+    </header>
+
+    <section class="search-section">
+        <input type="text" id="searchInput" class="search-input" placeholder="이름, 종류, 설명으로 검색 (예: 글렌, 발렌타인, 한정판)" onkeyup="filterList()">
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-label">전체</span>
+                <span class="stat-count" id="count-total">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">싱글몰트</span>
+                <span class="stat-count" id="count-singlemalt">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">블렌디드</span>
+                <span class="stat-count" id="count-blended">0</span>
+            </div>
+        </div>
+    </section>
+
+    <nav class="category-tabs">
+        <button class="tab-btn active" onclick="setCategory('전체')">전체</button>
+        <button class="tab-btn" onclick="setCategory('싱글몰트')">싱글몰트</button>
+        <button class="tab-btn" onclick="setCategory('블렌디드')">블렌디드</button>
+    </nav>
+
+    <main class="liquor-list" id="liquorList">
+    </main>
+</div>
+
+<script>
+    // 요청하신 순서대로 나열된 위스키 데이터
+    const liquorData = [
+        // 싱글몰트
+        { name: "글렌피딕", type: "싱글몰트", desc: "스페이사이드 대표 싱글몰트 위스키" },
+        { name: "글렌드로낙", type: "싱글몰트", desc: "쉐리 가스크 숙성의 명가" },
+        { name: "글렌알라키", type: "싱글몰트", desc: "빌리 워커의 손길을 거친 싱글몰트" },
+        { name: "야마자키", type: "싱글몰트", desc: "일본 최초의 싱글몰트 위스키 증류소" },
+        { name: "히비키", type: "싱글몰트", desc: "산토리의 블렌디드/몰트 위스키 라인업" },
+
+        // 블렌디드
+        { name: "발렌타인 파이니스트", type: "블렌디드", desc: "스탠다드 블렌디드 위스키" },
+        { name: "발렌타인 마스터", type: "블렌디드", desc: "한국 한정판으로 출시된 블렌디드 위스키" },
+        { name: "발렌타인 12년", type: "블렌디드", desc: "프리미엄 블렌디드 위스키" },
+        { name: "발렌타인 17년", type: "블렌디드", desc: "스테디셀러 프리미엄 위스키" },
+        { name: "발렌타인 21년", type: "블렌디드", desc: "고급스러운 풍미의 고숙성 위스키" },
+        { name: "발렌타인 30년", type: "블렌디드", desc: "발렌타인의 최고급 플래그십 위스키" },
+        { name: "조니워커 레드", type: "블렌디드", desc: "하이볼 및 믹스용 스탠다드 위스키" },
+        { name: "조니워커 블론드", type: "블렌디드", desc: "믹솔로지용 부드러운 스타일의 위스키" },
+        { name: "조니워커 블랙", type: "블렌디드", desc: "12년 숙성 기준의 대표 블렌디드 위스키" },
+        { name: "조니워커 더블블랙", type: "블렌디드", desc: "강렬하고 스모키한 풍미를 강조한 위스키" },
+        { name: "조니워커 루비", type: "블렌디드", desc: "조니워커의 특별 라인업 위스키" },
+        { name: "조니워커 골드리저브", type: "블렌디드", desc: "화려하고 부드러운 풍미의 블렌디드" },
+        { name: "조니워커 그린", type: "블렌디드", desc: "15년 숙성 블렌디드 몰트 위스키" },
+        { name: "조니워커 18년", type: "블렌디드", desc: "깊고 풍부한 풍미의 고숙성 라인" },
+        { name: "조니워커 블루라벨", type: "블렌디드", desc: "조니워커 최고급 라인업" },
+        { name: "로얄 살루트 21년", type: "블렌디드", desc: "영국 엘리자베스 2세 여왕 대관식 기념 위스키" },
+        { name: "로얄 살루트 25년", type: "블렌디드", desc: "트레저드 블렌드 25년 숙성" },
+        { name: "로얄 살루트 30년", type: "블렌디드", desc: "키 오브 더 킹덤 30년 숙성" },
+        { name: "로얄 살루트 38년", type: "블렌디드", desc: "운명의 돌(Stone of Destiny) 38년 숙성" }
+    ];
+
+    let currentCategory = '전체';
+
+    // 카운터 업데이트
+    function updateCounts() {
+        document.getElementById('count-total').innerText = liquorData.length;
+        document.getElementById('count-singlemalt').innerText = liquorData.filter(item => item.type === '싱글몰트').length;
+        document.getElementById('count-blended').innerText = liquorData.filter(item => item.type === '블렌디드').length;
+    }
+
+    // 리스트 렌더링
+    function renderList(data) {
+        const listContainer = document.getElementById('liquorList');
+        listContainer.innerHTML = '';
+
+        if (data.length === 0) {
+            listContainer.innerHTML = `<div style="text-align:center; color: var(--text-sub); padding: 30px 0;">검색 결과가 없습니다.</div>`;
+            return;
+        }
+
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'liquor-card';
+            card.innerHTML = `
+                <div class="liquor-info">
+                    <div class="liquor-name">${item.name}</div>
+                    <div class="liquor-desc">${item.desc}</div>
+                </div>
+                <span class="badge">${item.type}</span>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    // 필터링 처리 (검색어 + 탭)
+    function filterList() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        
+        const filtered = liquorData.filter(item => {
+            const matchesCategory = (currentCategory === '전체') || (item.type === currentCategory);
+            const matchesSearch = item.name.toLowerCase().includes(query) ||
+                                  item.type.toLowerCase().includes(query) ||
+                                  item.desc.toLowerCase().includes(query);
+            return matchesCategory && matchesSearch;
+        });
+
+        renderList(filtered);
+    }
+
+    // 카테고리 변경
+    function setCategory(category) {
+        currentCategory = category;
+        
+        // 버튼 활성화 스타일 변경
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            if (btn.innerText === category) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        filterList();
+    }
+
+    // 홈 배너 클릭 시 리셋
+    function resetFilter() {
+        document.getElementById('searchInput').value = '';
+        setCategory('전체');
+    }
+
+    // 초기화
+    window.onload = () => {
+        updateCounts();
+        renderList(liquorData);
+    };
+</script>
+
+</body>
+</html>
